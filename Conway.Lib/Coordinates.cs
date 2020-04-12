@@ -9,5 +9,6 @@ namespace Conway.Lib {
         public int column { get; }
 
         public override string ToString() => $"({row}, {column})";
+        public bool Equals(Coordinates coords) => coords.row == row && coords.column == column;
     }
 }

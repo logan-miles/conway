@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Conway.Lib {
     public class Game {
@@ -21,6 +22,18 @@ namespace Conway.Lib {
             board[coordinates.row, coordinates.column].IsAlive = value;
         }
 
+        internal int GetLength(int v) {
+            return board.GetLength(v);
+        }
+
+        public bool HasLife(Coordinates coordinates) {
+            return GetCell(coordinates).IsAlive;
+        }
+
+        private Cell GetCell(Coordinates coordinates) {
+            return board[coordinates.row, coordinates.column];
+        }
+
         public Cell[, ] GetStatus() {
             return board;
         }
@@ -30,13 +43,27 @@ namespace Conway.Lib {
 
             for (int i = 0; i < nextBoard.GetLength(0); i++) {
                 for (int j = 0; j < nextBoard.GetLength(1); j++) {
-                    board[i, j] = new Cell(ShouldHaveLife(new Coordinates(i, j)));
+                    board[i, j] = new Cell(Rules.ShouldBeAlive(new Coordinates(i, j), this));
                 }
             }
         }
 
-        private bool ShouldHaveLife(Coordinates coordinates) {
-            throw new NotImplementedException();
+        public IEnumerable<Cell> GetNeighbors(Coordinates coordinates) {
+            List<Cell> neighbors = new List<Cell>();
+            for (int i = coordinates.row - 1; i <= coordinates.row + 1; i++) {
+                if (i < 0 || i >= GetLength(0))
+                    continue;
+                for (int j = coordinates.column - 1; j <= coordinates.column + 1; j++) {
+                    if (j < 0 || j >= GetLength(1))
+                        continue;
+
+                    Coordinates neighbor = new Coordinates(i, j);
+                    if (!coordinates.Equals(neighbor) && HasLife(neighbor))
+                        neighbors.Add(GetCell(neighbor));
+                }
+            }
+
+            return neighbors;
         }
     }
 }
